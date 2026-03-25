@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Clock Manager</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="/storage/internal/scripts/embed-detect.js"></script>
+    <script src="/storage/internal/scripts/theme-manager.js"></script>
+    
+    <style>
+        :root {
+            --background: 225 6% 7%;
+            --foreground: 0 0% 85%;
+            --card: 0 0% 9%;
+            --primary: 160 52% 45%;
+            --accent: 160 52% 45%;
+            --accent-foreground: 0 0% 98%;
+            --border: 225 6% 20%;
+            --muted-foreground: 225 5% 55%;
+            --secondary: 0 0% 12%;
+            --destructive: 0 60% 50%;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: transparent;
+            color: hsl(var(--foreground));
+            padding: 40px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .page-container { max-width: 1200px; margin: 0 auto; }
+
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .page-title {
+            font-size: 32px;
+            color: hsl(var(--accent));
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .header-controls { display: flex; gap: 12px; align-items: center; }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: hsl(var(--card));
+            border: 2px solid hsl(var(--border));
+            padding: 24px;
+            transition: border-color 0.2s ease;
+        }
+
+        .card:hover { border-color: hsl(var(--accent)); }
+
+        .card-header { display: flex; gap: 10px; margin-bottom: 20px; }
+
+        .tz-input {
+            flex-grow: 1;
+            background: hsl(var(--secondary));
+            color: hsl(var(--foreground));
+            border: 1px solid hsl(var(--border));
+            font-family: inherit;
+            padding: 8px 12px;
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+        }
+
+        .tz-input:focus { border-color: hsl(var(--accent)); }
+
+        .time-display {
+            font-size: 42px;
+            font-weight: 700;
+            color: hsl(var(--accent));
+            line-height: 1;
+            margin-bottom: 15px;
+            white-space: nowrap;
+        }
+
+        .stats-row {
+            font-size: 13px;
+            color: hsl(var(--muted-foreground));
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            border-top: 1px solid hsl(var(--border));
+            padding-top: 15px;
+        }
+
+        .stats-row b { color: hsl(var(--foreground)); }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: hsl(var(--accent));
+            color: hsl(var(--accent-foreground));
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid hsl(var(--border));
+            color: hsl(var(--foreground));
+            padding: 8px 15px;
+            font-size: 13px;
+        }
+
+        .btn-remove {
+            background: hsl(var(--border));
+            color: hsl(var(--foreground));
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: none; font-size: 18px; flex-shrink: 0;
+        }
+
+        .btn-remove:hover { background: hsl(var(--destructive)); color: white; }
+
+        @media (max-width: 768px) {
+            body { padding: 20px; }
+            .header-flex { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="page-container">
+        <div class="header-flex">
+            <h1 class="page-title">World Clocks</h1>
+            <div class="header-controls">
+                <button class="btn btn-outline" onclick="toggleFormat()" id="format-toggle">24H</button>
+                <button class="btn" onclick="addClock()">+ Add Clock</button>
+            </div>
+        </div>
+        <div id="clocks-container" class="cards-grid"></div>
+    </div>
+
+    <datalist id="tz-list"></datalist>
+
+    <script>
+        const TZ_MAP = {
+            'EST': 'America/New_York', 'EDT': 'America/New_York',
+            'CST': 'America/Chicago', 'CDT': 'America/Chicago',
+            'MST': 'America/Denver', 'MDT': 'America/Denver',
+            'PST': 'America/Los_Angeles', 'PDT': 'America/Los_Angeles',
+            'AEST': 'Australia/Sydney', 'AEDT': 'Australia/Sydney',
+            'ADT': 'America/Halifax', 'BST': 'Europe/London',
+            'IST': 'Asia/Kolkata', 'JST': 'Asia/Tokyo'
+        };
+
+        let clocks = JSON.parse(localStorage.getItem('world-clocks')) || ['UTC', 'America/New_York'];
+        let is24Hour = localStorage.getItem('clock-format') !== '12h';
+
+
+        const allIANA = Intl.supportedValuesOf('timeZone');
+        const datalist = document.getElementById('tz-list');
+        allIANA.forEach(tz => {
+            const opt = document.createElement('option');
+            opt.value = tz;
+            datalist.appendChild(opt);
+        });
+
+        function toggleFormat() {
+            is24Hour = !is24Hour;
+            localStorage.setItem('clock-format', is24Hour ? '24h' : '12h');
+            updateDisplay();
+        }
+
+        function addClock() {
+            clocks.push('UTC');
+            localStorage.setItem('world-clocks', JSON.stringify(clocks));
+            render();
+        }
+
+        function removeClock(index) {
+            clocks.splice(index, 1);
+            localStorage.setItem('world-clocks', JSON.stringify(clocks));
+            render();
+        }
+
+        function updateClockTimezone(index, val) {
+            clocks[index] = val;
+            localStorage.setItem('world-clocks', JSON.stringify(clocks));
+            updateDisplay();
+        }
+
+        /**
+         * The Fix: Get numeric hours from any timezone string safely
+         */
+        function getTzMoment(tzName) {
+            const now = new Date();
+            let resolvedTz = tzName.trim();
+            if (TZ_MAP[resolvedTz.toUpperCase()]) resolvedTz = TZ_MAP[resolvedTz.toUpperCase()];
+
+
+            const offsetMatch = resolvedTz.match(/^(?:UTC|GMT)?([+-])(\d{1,2})(?::?(\d{2}))?$/i);
+            if (offsetMatch) {
+                const sign = offsetMatch[1] === '+' ? 1 : -1;
+                const h = parseInt(offsetMatch[2]);
+                const m = parseInt(offsetMatch[3] || 0);
+                const offsetMs = (h * 3600000) + (m * 60000);
+                return new Date(now.getTime() + (now.getTimezoneOffset() * 60000) + (sign * offsetMs));
+            }
+
+
+            try {
+                const str = now.toLocaleString('en-US', { timeZone: resolvedTz, hour12: false });
+                return new Date(str);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function getOffsetInfo(input) {
+			const targetDate = getTzMoment(input);
+			if (!targetDate) return { timeStr: "Invalid TZ", utcText: "---", diffText: "---" };
+
+			const now = new Date();
+			const localDate = new Date(now.toLocaleString('en-US', { hour12: false }));
+			const utcDate = new Date(now.toLocaleString('en-US', { timeZone: 'UTC', hour12: false }));
+
+			const utcOffset = Math.round((targetDate - utcDate) / 36000) / 100;
+			const localDiff = Math.round((targetDate - localDate) / 36000) / 100;
+
+			const timeStr = targetDate.toLocaleTimeString('en-US', {
+				hour: '2-digit', minute: '2-digit', second: '2-digit',
+				hour12: !is24Hour
+			});
+
+
+			let utcText = "UTC";
+			if (utcOffset !== 0) {
+				const sign = utcOffset > 0 ? "+" : "-";
+				utcText = `UTC ${sign} ${Math.abs(utcOffset)}`;
+			}
+			
+			let diffText = "";
+			if (Math.abs(localDiff) < 0.01) {
+				diffText = "Same as local";
+			} else {
+				const absDiff = Math.abs(localDiff);
+				diffText = `${absDiff}h ${localDiff > 0 ? 'ahead of' : 'behind'} local`;
+			}
+
+			return { timeStr, utcText, diffText };
+		}
+
+        function render() {
+            const container = document.getElementById('clocks-container');
+            document.getElementById('format-toggle').textContent = is24Hour ? '24H' : '12H';
+            container.innerHTML = clocks.map((currentTz, index) => `
+                <div class="card">
+                    <div class="card-header">
+                        <input type="text" class="tz-input" list="tz-list" value="${currentTz}" oninput="updateClockTimezone(${index}, this.value)">
+                        <button class="btn-remove" onclick="removeClock(${index})">✕</button>
+                    </div>
+                    <div class="time-display" id="time-${index}">--:--:--</div>
+                    <div class="stats-row">
+                        <span>Offset: <b id="utc-${index}">---</b></span>
+                        <span>Diff: <b id="diff-${index}">---</b></span>
+                    </div>
+                </div>
+            `).join('');
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            clocks.forEach((tz, index) => {
+                const data = getOffsetInfo(tz);
+                const t = document.getElementById(`time-${index}`);
+                const u = document.getElementById(`utc-${index}`);
+                const d = document.getElementById(`diff-${index}`);
+                if (t) t.textContent = data.timeStr;
+                if (u) u.textContent = data.utcText;
+                if (d) d.textContent = data.diffText;
+            });
+        }
+
+        setInterval(updateDisplay, 1000);
+        render();
+
+
+        function applySavedTheme() {
+            const theme = localStorage.getItem('selected-theme') || 'vitesse-dark';
+            const custom = localStorage.getItem('custom-theme-data');
+            if (theme === 'custom' && custom) {
+                const data = JSON.parse(custom);
+                Object.keys(data).forEach(k => {
+                    document.documentElement.style.setProperty('--' + k.replace(/([A-Z])/g, '-$1').toLowerCase(), data[k]);
+                });
+            }
+        }
+        applySavedTheme();
+        window.addEventListener('message', (e) => { if (e.data === 'iframe-loaded') applySavedTheme(); });
+    </script>
+</body>
+</html>

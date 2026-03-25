@@ -1,4 +1,19 @@
 blogs:
+  - id: 27
+    date: 25/03/2025
+    title: "Shoutout to Leg.GG"
+    content: |-
+      random thing but shoutout to leg.gg which has the best community ever fr
+      :P its a minecraft server and on java it's leg.gg bedrock is play.leg.gg (default port)
+      alr cyall XD
+
+  - id: 26
+    date: 19/03/2026
+    title: "birthday!"
+    content: |-
+      today's my birthday!
+      thats it. XD cyall
+
   - id: 25
     date: 10/02/2026
     title: "mobile support"

@@ -79,38 +79,46 @@ items:
     title: "Now That's A Plot Twist"
     path: "/storage/store/oricade/Now That's A Plot Twist.mp3"
 
-  - id: 20
+  - id: 19
     title: "Zyyn's Theme"
     path: "/storage/store/oricade/Zyyn's Theme - Oricade.mp3"
 
-  - id: 21
+  - id: 20
     title: "Hyqi's Theme"
     path: "/storage/store/oricade/Hyqi's Theme - Oricade.mp3"
 
-  - id: 22
+  - id: 21
     title: "Loxm's Theme"
     path: "/storage/store/oricade/Loxm's Theme - Oricade.mp3"
 
-  - id: 23
+  - id: 22
     title: "Tyzi's Theme"
     path: "/storage/store/oricade/Tyzi's Theme - Oricade.mp3"
 
-  - id: 24
+  - id: 23
     title: "Fiwu's Theme"
     path: "/storage/store/oricade/Fiwu's Theme - Oricade.mp3"
   
-  - id: 25
+  - id: 24
     title: "Qyli's Theme"
     path: "/storage/store/oricade/Qyli's Theme - Oricade.mp3"
 
-  - id: 27
+  - id: 25
     title: "Ori's Theme"
     path: "/storage/store/oricade/Ori's Theme - Oricade.mp3"
 
-  - id: 28
+  - id: 26
+    title: "Rymi's Theme"
+    path: "/storage/store/oricade/Rymi's Theme.mp3"
+
+  - id: 27
     title: "Remarkable Speed"
     path: "/storage/store/oricade/Remarkable Speed - Oricade.mp3"
 
-  - id: 29
+  - id: 28
     title: "Your Last Blink (Until You Die)"
     path: "/storage/store/oricade/Your Last Blink (Until You Die) - Oricade.mp3"
+  
+  - id: 29
+    title: "I think that I'm dead"
+    path: "/storage/store/oricade/I think that I'm dead.mp3"

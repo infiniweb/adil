@@ -100,3 +100,9 @@ customPages:
         type:
           type: html
         hidden: true
+      
+      - id: globe
+        name: "World Clock Viewer"
+        path: ~/worldclock.html
+        type:
+          type: html
