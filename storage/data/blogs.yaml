@@ -1,6 +1,12 @@
 blogs:
+  - id: 28
+    date: 19/04/2026
+    title: "im alive"
+    content: |-
+      idk i dont have much to say so, im still here lol
+
   - id: 27
-    date: 25/03/2025
+    date: 25/03/2026
     title: "Shoutout to Leg.GG"
     content: |-
       random thing but shoutout to leg.gg which has the best community ever fr
