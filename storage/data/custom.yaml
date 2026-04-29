@@ -1,108 +1,18 @@
 customPages:
-  extra:
-    display: "Extra Content"
-    sub:
-      - id: writing
-        name: "Writing Projects"
-        path: ~/writing.yaml
-        type:
-          type: section
+#  empty_section1:
+#    display: "Empty Header"
+#    sub:
+#      - id: empty_id1
+#        name: "Empty Page"
+#        path: ~/empty1.yaml
+#        type:
+#          type: section|gallery|raw|md|html
 
-      - id: books
-        display: "| Books"
-        name: "Books"
-        path: ~/writing/books.yaml
-        type:
-          type: section
-
-      - id: poems
-        display: "└ Poems"
-        name: "Poems"
-        path: ~/writing/poems.yaml
-        type:
-          type: section
-  
-  archive:
-    display: "Archives"
-    sub:
-      - id: oricde
-        name: "Oricade Songs"
-        path: ~/oricade.yaml
-        type:
-          type: gallery
-  
-  tests:
-    display: "Testing"
-    sub:
-      - id: 1
-        name: "Test Gallery"
-        path: tests/gallery.yaml
-        type:
-          type: gallery
-        hidden: true
-
-      - id: 2
-        name: "Test Raw"
-        path: tests/raw.md
-        type:
-          type: raw
-        hidden: true
-
-      - id: 3
-        name: "Test Markdown"
-        path: tests/raw.md
-        type:
-          type: md
-        hidden: true
-
-      - id: 4
-        name: "Test Locked Gallery"
-        path: tests/gallery.yaml
-        type:
-          type: gallery
-        locked: true
-
-      - id: 5
-        name: "Test Locked Raw"
-        path: tests/raw.md
-        type:
-          type: raw
-        locked: true
-
-      - id: 6
-        name: "Test Locked Markdown"
-        path: tests/raw.md
-        type:
-          type: md
-        locked: true
-
-  feedback:
-    display: "Feedback"
-    sub:
-      - id: feedback
-        name: "Feedback"
-        path: ~/../main/feedback.html
-        type:
-          type: html
-      
-      - id: guestbook
-        name: "Guestbook"
-        path: ~/../main/guestbook.html
-        type:
-          type: html
-
-  other:
-    display: "Other"
-    sub:
-      - id: funcgen
-        name: "Function Generator"
-        path: ~/function_generator.html
-        type:
-          type: html
-        hidden: true
-      
-      - id: globe
-        name: "World Clock Viewer"
-        path: ~/worldclock.html
-        type:
-          type: html
+#  empty_section2:
+#    display: "Empty Header"
+#    sub:
+#      - id: empty_id2
+#        name: "Empty Raw Page"
+#        path: ~/@empty2
+#        type:
+#          type: raw

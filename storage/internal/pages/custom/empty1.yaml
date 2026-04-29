@@ -1,0 +1,6 @@
+pages:
+  - id: empty_id
+    name: "Empty Name"
+    path: NA
+    type:
+      type: section|gallery|raw|md|html

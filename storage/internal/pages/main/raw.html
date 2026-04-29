@@ -7,8 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="/storage/internal/scripts/embed-detect.js"></script>
-    <script src="/storage/internal/scripts/theme-manager.js"></script>
+    <script src="storage/internal/scripts/embed-detect.js"></script>
+    <script src="storage/internal/scripts/theme-manager.js"></script>
     
     <style>
         :root {
@@ -22,7 +22,7 @@
 
         body {
             background-color: var(--bg-color);
-            background-image: url(/storage/assets/background.png);
+            background-image: url(storage/assets/background.png);
             background-attachment: fixed;
             margin: 0;
             font-family: 'JetBrains Mono', monospace;
@@ -201,7 +201,7 @@ white-space: pre;
 
             try {
                 try {
-                    const yamlResp = await fetch('/storage/data/raw.yaml');
+                    const yamlResp = await fetch('storage/data/raw.yaml');
                     if (yamlResp.ok) {
                         const yamlText = await yamlResp.text();
                         config = jsyaml.load(yamlText) || config;
@@ -210,7 +210,7 @@ white-space: pre;
                     console.warn("raw.yaml not found, using default mappings");
                 }
 
-                const response = await fetch('/storage/data/' + filePath);
+                const response = await fetch('storage/data/' + filePath);
                 if (!response.ok) throw new Error(`File not found: ${filePath}`);
                 
                 const rawCode = await response.text();

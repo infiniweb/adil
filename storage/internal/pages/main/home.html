@@ -7,22 +7,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/storage/internal/styles/page-styles.css">
-    <script src="/storage/internal/scripts/embed-detect.js"></script>
-    <script src="/storage/internal/scripts/theme-manager.js"></script>
+    <link rel="stylesheet" href="storage/internal/styles/page-styles.css">
+    <script src="storage/internal/scripts/embed-detect.js"></script>
+    <script src="storage/internal/scripts/theme-manager.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
     <style>
-        .blog-preview-card {
-            display: block;
-            text-decoration: none;
-            color: inherit;
-            transition: transform 0.2s ease, border-color 0.2s ease;
-        }
-        .blog-preview-card:hover {
-            transform: translateY(-2px);
-            border-color: hsl(var(--accent));
-        }
         .preview-title {
             font-weight: 700;
             font-size: 1.1rem;
@@ -38,6 +28,10 @@
             line-height: 1.5;
             font-size: 0.9rem;
         }
+        .social-card.discord-status {
+            border-color: #5865F2;
+            color: #5865F2;
+        }
     </style>
 </head>
 <body>
@@ -46,124 +40,124 @@
         
         <div id="about-me" class="section">
             <h2>About Me</h2>
-            <div class="card bio-card"></div>
-        </div>
-
-        <div id="latest-blog" class="section">
-            <h2>Latest Blog Post</h2>
-            <div id="blog-preview-container">
-            </div>
-        </div>
-        
-        <div id="skills" class="section">
-            <h2>Skills</h2>
-            <div class="skills-grid"></div>
+            <div class="card bio-card">Loading bio...</div>
         </div>
         
         <div id="socials" class="section">
             <h2>Socials</h2>
             <div class="socials-grid"></div>
         </div>
+        
+        <div id="skills" class="section">
+            <h2>Skills</h2>
+            <div class="skills-grid"></div>
+        </div>
     </div>
     
     <script>
-        async function loadYAML(path) {
-            const response = await fetch(path);
-            const text = await response.text();
-            return jsyaml.load(text);
+        async function fetchDiscordData(userId) {
+            try {
+                const [bioRes, statusRes] = await Promise.all([
+                    fetch(`https://dcdn.dstn.to/profile/${userId}?t=${Date.now()}`),
+                    fetch(`https://api.lanyard.rest/v1/users/${userId}`)
+                ]);
+
+                const bioData = await bioRes.json();
+                const statusData = await statusRes.json();
+
+                let bio = "This user has no bio set on Discord.";
+                if (bioData.user_profile && bioData.user_profile.bio) {
+                    bio = bioData.user_profile.bio;
+                } else if (bioData.user && bioData.user.bio) {
+                    bio = bioData.user.bio;
+                }
+
+                const statusMap = {
+                    'online': 'Online',
+                    'dnd': 'DND',
+                    'idle': 'Idle',
+                    'offline': 'Offline'
+                };
+                const rawStatus = statusData.data?.discord_status || 'offline';
+                const statusText = statusMap[rawStatus] || 'Offline';
+
+                return { bio, statusText };
+            } catch (error) {
+                console.error('Discord API Error:', error);
+                try {
+                    const fallback = await fetch(`https://discordlookup.mesalytic.moe/v1/user/${userId}`);
+                    const fbData = await fallback.json();
+                    return { bio: fbData.bio || "Bio unavailable.", statusText: "Offline" };
+                } catch (e) {
+                    return { bio: "Bio currently unavailable.", statusText: "Offline" };
+                }
+            }
         }
 
-        function parseDate(dateStr) {
-            const [day, month, year] = dateStr.split('/').map(Number);
-            return new Date(year, month - 1, day);
+        async function refreshDiscordUI() {
+            const DISCORD_ID = '974512844924145695';
+            const bioCard = document.querySelector('.bio-card');
+            const socialsGrid = document.querySelector('.socials-grid');
+            
+            const data = await fetchDiscordData(DISCORD_ID);
+            
+            if (bioCard) {
+                bioCard.innerHTML = marked.parse(data.bio);
+            }
+
+            let discordCard = document.getElementById('discord-live-card');
+            if (!discordCard) {
+                discordCard = document.createElement('a');
+                discordCard.id = 'discord-live-card';
+                discordCard.className = 'social-card discord-status';
+                discordCard.href = `https://discord.com/users/${DISCORD_ID}/`;
+                discordCard.target = '_blank';
+                socialsGrid.prepend(discordCard);
+            }
+            discordCard.textContent = `Discord | ${data.statusText}`;
+            
+            console.log("Discord UI Refreshed:", new Date().toLocaleTimeString());
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
+            await refreshDiscordUI();
+
+            setInterval(refreshDiscordUI, 600000);
+
             try {
-                const data = await loadYAML('/storage/data/home.yaml');
-                const homeData = data.home;
-                
-                if (homeData.bio) {
-                    const bioCard = document.querySelector('.bio-card');
-                    bioCard.innerHTML = marked.parse(homeData.bio);
-                }
-                
-                if (homeData.skills) {
-                    const skillsGrid = document.querySelector('.skills-grid');
-                    homeData.skills.forEach(skillItem => {
-                        const skillText = typeof skillItem === 'string' ? skillItem : skillItem.skill;
-                        const skillLink = typeof skillItem === 'object' ? skillItem.link : null;
-                        
-                        if (skillLink) {
-                            const card = document.createElement('a');
-                            card.className = 'skill-card skill-card-link';
-                            card.href = skillLink;
-                            card.target = '_blank';
-                            card.rel = 'noopener noreferrer';
-                            card.textContent = skillText;
-                            skillsGrid.appendChild(card);
-                        } else {
-                            const card = document.createElement('div');
-                            card.className = 'skill-card';
-                            card.textContent = skillText;
-                            skillsGrid.appendChild(card);
-                        }
-                    });
-                }
-                
+                const response = await fetch('storage/data/home.yaml');
+                const text = await response.text();
+                const yamlData = jsyaml.load(text);
+                const homeData = yamlData.home;
+
                 if (homeData.socials) {
                     const socialsGrid = document.querySelector('.socials-grid');
                     homeData.socials.forEach(social => {
-                        const card = document.createElement('a');
-                        card.className = 'social-card';
-                        card.href = social.link;
-                        card.target = '_blank';
-                        card.rel = 'noopener noreferrer';
-                        card.textContent = social.name;
-                        socialsGrid.appendChild(card);
+                        if (social.name.toLowerCase() !== 'discord') {
+                            const card = document.createElement('a');
+                            card.className = 'social-card';
+                            card.href = social.link;
+                            card.target = '_blank';
+                            card.textContent = social.name;
+                            socialsGrid.appendChild(card);
+                        }
                     });
                 }
-            } catch (error) {
-                console.error('Error loading home page:', error);
-            }
 
-            try {
-                const blogData = await loadYAML('/storage/data/blogs.yaml');
-                if (blogData && blogData.blogs && blogData.blogs.length > 0) {
-                    const sortedBlogs = blogData.blogs.sort((a, b) => parseDate(b.date) - parseDate(a.date));
-                    const latest = sortedBlogs[0];
-
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = marked.parse(latest.content);
-                    const plainText = tempDiv.textContent || tempDiv.innerText || "";
-
-                    let excerpt = plainText.trim();
-                    if (excerpt.length > 100) {
-                        excerpt = excerpt.substring(0, 100).replace(/[ ,.]*$/, "") + "...";
-                    }
-
-                    const container = document.getElementById('blog-preview-container');
-                    
-                    container.innerHTML = `
-                        <div class="card blog-preview-card" style="cursor: pointer;" onclick="window.parent.location.hash = 'page=blogs&id=${latest.id}'">
-                            <div class="preview-title">${latest.title}</div>
-                            <div class="preview-date">${latest.date}</div>
-                            <div class="preview-excerpt">${excerpt}</div>
-                        </div>
-                    `;
+                if (homeData.skills) {
+                    const skillsGrid = document.querySelector('.skills-grid');
+                    homeData.skills.forEach(item => {
+                        const text = typeof item === 'string' ? item : item.skill;
+                        const link = typeof item === 'object' ? item.link : null;
+                        const card = link ? document.createElement('a') : document.createElement('div');
+                        card.className = link ? 'skill-card skill-card-link' : 'skill-card';
+                        if (link) { card.href = link; card.target = '_blank'; }
+                        card.textContent = text;
+                        skillsGrid.appendChild(card);
+                    });
                 }
-            } catch (error) {
-                console.error('Error loading latest blog:', error);
-            }
-            
-            if (window.location.hash) {
-                const hash = window.location.hash.substring(1);
-                const target = document.getElementById(hash);
-                if (target) {
-                    setTimeout(() => {
-                        target.scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
-                }
+            } catch (e) {
+                console.warn("YAML data failed to load.");
             }
         });
     </script>

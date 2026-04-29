@@ -7,9 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/storage/internal/styles/page-styles.css">
-    <script src="/storage/internal/scripts/embed-detect.js"></script>
-    <script src="/storage/internal/scripts/theme-manager.js"></script>
+    <link rel="stylesheet" href="storage/internal/styles/page-styles.css">
+    <script src="storage/internal/scripts/embed-detect.js"></script>
+    <script src="storage/internal/scripts/theme-manager.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
     <style>
@@ -115,7 +115,7 @@
 
         function resolvePath(relativePath, baseDir) {
             if (relativePath.startsWith('~/')) {
-                const path = '/storage/internal/pages/custom/' + relativePath.substring(2);
+                const path = 'storage/internal/pages/custom/' + relativePath.substring(2);
                 return normalizePath(path);
             }
             if (relativePath.startsWith('/')) {
@@ -215,7 +215,7 @@
                         content.innerHTML = `<div class="card"><p>Error: Could not load markdown file at ${item.path}</p></div>`;
                     }
                 } else if (item.type === 'raw') {
-                    window.parent.location.href = `/storage/internal/pages/main/raw.html?file=${encodeURIComponent(item.path)}`;
+                    window.parent.location.href = `storage/internal/pages/main/raw.html?file=${encodeURIComponent(item.path)}`;
                     return;
                 }
             }
@@ -349,7 +349,7 @@
 
         async function init() {
             rootPageId = getParentParams().get('page');
-            const custom = await loadYAML('/storage/data/custom.yaml');
+            const custom = await loadYAML('storage/data/custom.yaml');
             if (!custom || !custom.customPages) return;
             for (const key in custom.customPages) {
                 const category = custom.customPages[key];
@@ -358,7 +358,7 @@
                     if (found) {
                         let resolvedPath = found.path;
                         if (resolvedPath.startsWith('~/')) {
-                            resolvedPath = '/storage/internal/pages/custom/' + resolvedPath.substring(2);
+                            resolvedPath = 'storage/internal/pages/custom/' + resolvedPath.substring(2);
                         }
                         customPageData = { ...found, path: normalizePath(resolvedPath) };
                         break;

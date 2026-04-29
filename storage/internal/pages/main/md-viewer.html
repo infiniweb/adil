@@ -7,9 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/storage/internal/styles/page-styles.css">
-    <script src="/storage/internal/scripts/embed-detect.js"></script>
-    <script src="/storage/internal/scripts/theme-manager.js"></script>
+    <link rel="stylesheet" href="storage/internal/styles/page-styles.css">
+    <script src="storage/internal/scripts/embed-detect.js"></script>
+    <script src="storage/internal/scripts/theme-manager.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
     <style>
         .md-content { word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; max-width: 100%; overflow-x: hidden; }
@@ -102,7 +102,7 @@
                     return;
                 }
                 
-                const markdown = await loadMarkdown('/storage/data/' + filePath);
+                const markdown = await loadMarkdown('storage/data/' + filePath);
                 document.getElementById('md-content').innerHTML = await marked.parse(markdown);
                 setupShikiInteractions();
                 
