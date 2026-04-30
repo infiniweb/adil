@@ -167,8 +167,8 @@ async function loadPage(pageName, args = '') {
         if (href && href.includes(`page=${pageName}`)) link.classList.add('active');
     });
     
-    const pageBase = '/storage/internal/pages/main/';
-    const customData = await loadYAML('/storage/data/custom.yaml');
+    const pageBase = '/adil/storage/internal/pages/main/';
+    const customData = await loadYAML('/adil/storage/data/custom.yaml');
     if (customData && customData.customPages) {
         let customPage = null;
         for (const key in customData.customPages) {
@@ -188,7 +188,7 @@ async function loadPage(pageName, args = '') {
 
             let pagePath = customPage.path;
             if (pagePath.startsWith('~/')) {
-                pagePath = '/storage/internal/pages/custom/' + pagePath.substring(2);
+                pagePath = '/adil/storage/internal/pages/custom/' + pagePath.substring(2);
                 const pathParts = pagePath.split('/');
                 const resolvedParts = [];
                 for (const part of pathParts) {

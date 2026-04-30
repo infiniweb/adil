@@ -7,9 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="storage/internal/styles/page-styles.css">
-    <script src="storage/internal/scripts/embed-detect.js"></script>
-    <script src="storage/internal/scripts/theme-manager.js"></script>
+    <link rel="stylesheet" href="/adil/storage/internal/styles/page-styles.css">
+    <script src="/adil/storage/internal/scripts/embed-detect.js"></script>
+    <script src="/adil/storage/internal/scripts/theme-manager.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
     <style>
@@ -125,7 +125,7 @@
             setInterval(refreshDiscordUI, 600000);
 
             try {
-                const response = await fetch('storage/data/home.yaml');
+                const response = await fetch('/adil/storage/data/home.yaml');
                 const text = await response.text();
                 const yamlData = jsyaml.load(text);
                 const homeData = yamlData.home;

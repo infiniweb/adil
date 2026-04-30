@@ -289,7 +289,7 @@ a {
     left: 0;
     right: 0;
     bottom: 0;
-    background: #000;
+    background: transparent;
 }
 
 .page-background::after {
@@ -299,7 +299,7 @@ a {
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('/storage/assets/background.png');
+    background-image: url('/adil/storage/assets/background.png'); 
     background-size: cover;
     background-position: center;
     opacity: 0.3;
